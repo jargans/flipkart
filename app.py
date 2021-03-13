@@ -4,9 +4,10 @@ import requests
 from bs4 import BeautifulSoup as bs
 from urllib.request import urlopen as uReq
 import time
-
+import threading
 app = Flask(__name__)
-
+POOL_TIME = 5
+yourThread = threading.Thread()
 @app.route('/',methods=['GET'])  # route to display the home page
 @cross_origin()
 def homePage():
@@ -25,6 +26,8 @@ def index():
             time.sleep(30)
             soup = bs(flipkartPage, "html.parser")
             productlist = soup.find_all("div", {"class": "_1AtVbE col-12-12"})
+            yourThread = threading.Timer(POOL_TIME, index, ())
+            yourThread.start()
             productlinks = []
             for item in productlist:
                 for link in item.find_all('a', {'class': 's1Q9rs'}, href=True):
@@ -35,7 +38,7 @@ def index():
                     productlinks.append(baseurl + link['href'])
             product = []
             for link in productlinks[0:10]:
-                r = requests.get(link,timeout=30)
+                r = requests.get(link)
                 soup = bs(r.content, 'html.parser')
                 try:
                     name = soup.find('span', {'class': 'B_NuCI'}).text
@@ -80,4 +83,4 @@ def index():
         return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+	app.run(debug=True)
