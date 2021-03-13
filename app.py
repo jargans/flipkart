@@ -6,8 +6,6 @@ from urllib.request import urlopen as uReq
 import time
 import threading
 app = Flask(__name__)
-POOL_TIME = 5
-yourThread = threading.Thread()
 @app.route('/',methods=['GET'])  # route to display the home page
 @cross_origin()
 def homePage():
@@ -26,8 +24,6 @@ def index():
             time.sleep(30)
             soup = bs(flipkartPage, "html.parser")
             productlist = soup.find_all("div", {"class": "_1AtVbE col-12-12"})
-            yourThread = threading.Timer(POOL_TIME, index, ())
-            yourThread.start()
             productlinks = []
             for item in productlist:
                 for link in item.find_all('a', {'class': 's1Q9rs'}, href=True):
