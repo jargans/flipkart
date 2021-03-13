@@ -18,7 +18,7 @@ def index():
         try:
             searchString = request.form['content'].replace(" ","")
             baseurl = "https://www.flipkart.com/search?q=" + searchString
-            uClient = uReq(baseurl)
+            uClient = uReq(baseurl,,timeout=3)
             flipkartPage = uClient.read()
             uClient.close()
             time.sleep(30)
@@ -34,7 +34,7 @@ def index():
                     productlinks.append(baseurl + link['href'])
             product = []
             for link in productlinks[0:10]:
-                r = requests.get(link)
+                r = requests.get(link,,timeout=3)
                 soup = bs(r.content, 'html.parser')
                 try:
                     name = soup.find('span', {'class': 'B_NuCI'}).text
