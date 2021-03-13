@@ -22,6 +22,7 @@ def index():
             uClient = uReq(baseurl)
             flipkartPage = uClient.read()
             uClient.close()
+            time.sleep(30)
             soup = bs(flipkartPage, "html.parser")
             productlist = soup.find_all("div", {"class": "_1AtVbE col-12-12"})
             productlinks = []
