@@ -10,7 +10,7 @@ app = Flask(__name__)
 @cross_origin()
 def homePage():
     return render_template("index.html")
-
+    threading.Thread(target=index).start()
 @app.route('/review',methods=['POST','GET']) # route to show the review comments in a web UI
 @cross_origin()
 def index():
