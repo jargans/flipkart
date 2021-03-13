@@ -35,7 +35,7 @@ def index():
                     productlinks.append(baseurl + link['href'])
             product = []
             for link in productlinks[0:10]:
-                r = requests.get(link)
+                r = requests.get(link,timeout=30)
                 soup = bs(r.content, 'html.parser')
                 try:
                     name = soup.find('span', {'class': 'B_NuCI'}).text
