@@ -6,11 +6,21 @@ from urllib.request import urlopen as uReq
 import time
 import threading
 app = Flask(__name__)
+free_status = True
+class threadClass:
+    def __init__(self):
+        thread = threading.Thread(target=self.run(), args=())
+        thread.daemon = True  # Daemonize thread
+        thread.start()
+
+    def run(self):
+        free_status = True
+
 @app.route('/',methods=['GET'])  # route to display the home page
 @cross_origin()
 def homePage():
     return render_template("index.html")
-    threading.Thread(target=index).start()
+
 @app.route('/review',methods=['POST','GET']) # route to show the review comments in a web UI
 @cross_origin()
 def index():
@@ -18,23 +28,28 @@ def index():
         try:
             searchString = request.form['content'].replace(" ","")
             baseurl = "https://www.flipkart.com/search?q=" + searchString
-            uClient = uReq(baseurl,timeout=3)
+            uClient = uReq(baseurl)
             flipkartPage = uClient.read()
             uClient.close()
-            time.sleep(30)
             soup = bs(flipkartPage, "html.parser")
             productlist = soup.find_all("div", {"class": "_1AtVbE col-12-12"})
             productlinks = []
             for item in productlist:
+                threadClass()
                 for link in item.find_all('a', {'class': 's1Q9rs'}, href=True):
                     productlinks.append(baseurl + link['href'])
+                    threadClass()
                 for link in item.find_all('a', {'class': '_1fQZEK'}, href=True):
                     productlinks.append(baseurl + link['href'])
+                    threadClass()
                 for link in item.find_all('a', {'class': '_2UzuFa'}, href=True):
                     productlinks.append(baseurl + link['href'])
+                    threadClass()
+
             product = []
             for link in productlinks[0:10]:
-                r = requests.get(link,timeout=3)
+                threadClass()
+                r = requests.get(link)
                 soup = bs(r.content, 'html.parser')
                 try:
                     name = soup.find('span', {'class': 'B_NuCI'}).text
@@ -56,6 +71,7 @@ def index():
                     product.append(dict1)
                     # x = table.insert_one(dict1)
                 else:
+                    threadClass()
                     for c in commentbox:
                         try:
                             comtag = c.div.div.find_all('div', {'class': ''})
@@ -71,6 +87,7 @@ def index():
                         # x = table.insert_one(dict1)
             return render_template('results.html', product=product)
         except Exception as e:
+            threadClass()
             print('The Exception message is: ',e)
             return 'something is wrong'
     # return render_template('results.html')
@@ -79,4 +96,5 @@ def index():
         return render_template('index.html')
 
 if __name__ == "__main__":
+    #app.run(host='127.0.0.1', port=8001, debug=True)
 	app.run(debug=True)
